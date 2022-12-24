@@ -1,10 +1,9 @@
-
 from pyfirmata import Arduino, SERVO, util
 from tkinter import *
 from PIL import Image, ImageTk
 from tkinter import messagebox
 import imutils
-board= Arduino('/dev/cu.usbmodem1401')
+board= Arduino('/dev/cu.usbmodem1101')
 import time
 import cv2
 import numpy as np
@@ -144,17 +143,25 @@ def auto_pp():
                     base.write(89)
                     time.sleep(sleep)
 
-                for angle in range(100, 125, 1):
+                for angle in range(100, 121, 1):
                     grip.write(50)
                     link2.write(angle)
                     link1.write(58)
                     base.write(89)
                     time.sleep(0.1)
 
-            def pick_Obj(sleep):
+            def pick_Obj_red(sleep):
                 for angle in range(55, 71, 1):
                     grip.write(angle)
-                    link2.write(124)
+                    link2.write(120)
+                    link1.write(58)
+                    base.write(90)
+                    time.sleep(sleep)
+
+            def pick_Obj_blue(sleep):
+                for angle in range(55, 78, 1):
+                    grip.write(angle)
+                    link2.write(120)
                     link1.write(58)
                     base.write(90)
                     time.sleep(sleep)
@@ -203,35 +210,35 @@ def auto_pp():
                     time.sleep(0.1)
             def place_Obj_blue(sleep):
                 for angle in range(124, 71, -1):
-                    grip.write(70)
+                    grip.write(77)
                     link2.write(angle)
                     link1.write(58)
                     base.write(90)
                     time.sleep(sleep)
 
                 for angle in range(90, 56, 1):
-                    grip.write(70)
+                    grip.write(77)
                     link2.write(70)
                     link1.write(58)
                     base.write(angle)
                     time.sleep(sleep)
 
                 for angle in range(70, 101, 1):
-                    grip.write(70)
+                    grip.write(77)
                     link2.write(angle)
                     link1.write(58)
                     base.write(55)
                     time.sleep(sleep)
 
                 for angle in range(58, 46, -1):
-                    grip.write(70)
+                    grip.write(77)
                     link2.write(100)
                     link1.write(angle)
                     base.write(55)
                     time.sleep(sleep)
 
                 for angle in range(100, 126, 1):
-                    grip.write(70)
+                    grip.write(77)
                     link2.write(angle)
                     link1.write(43)
                     base.write(55)
@@ -279,12 +286,13 @@ def auto_pp():
                 base.write(90)
                 time.sleep(0.1)
             def start_():
-                cap = cv2.VideoCapture(1)
+                cap = cv2.VideoCapture(0)
                 cap.set(3, 640)
                 cap.set(4, 480)
 
                 while True:
                     _, frame = cap.read()
+                    frame=cv2.resize(frame,(400,500))
                     hsvimg = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
                     lower_red = np.array([0, 50, 120])
@@ -319,7 +327,7 @@ def auto_pp():
 
                                 print("Red box is found")
                                 move_to_obj(0.08)
-                                pick_Obj(0.01)
+                                pick_Obj_red(0.01)
                                 place_Obj_red(0.01)
                                 move_bake_red(0.01)
 
@@ -345,13 +353,13 @@ def auto_pp():
 
                                 print("Blue Box Detected")
                                 move_to_obj(0.08)
-                                pick_Obj(0.01)
+                                pick_Obj_blue(0.1)
                                 place_Obj_blue(0.01)
                                 move_bake_blue(0.01)
                                 done=1
                             else:
                                 print("Blue Box not exist")
-                    time.sleep(2)
+
 
                     # print(ObjectColor)
                     cv2.imshow("result", frame)
@@ -371,7 +379,7 @@ def auto_pp():
             camWin.title("Automatic Pick and Place")
 
             startBtn=Button(camWin,text="Start", command=start_, height=2,width=5).place(x=50,y=30)
-            stopbtn = Button(camWin, text="Stop", command=stop_, height=2, width=5).place(x=250, y=30)
+            stopbtn = Button(camWin, text="Cancel", command=stop_, height=2, width=5).place(x=250, y=30)
 
             camWin.mainloop()
 
@@ -379,8 +387,8 @@ def auto_pp():
     except:
         messagebox.showerror("Error","Color is not Selected")
         print("Color is not Selected")
-def prev():
-    pass
+def exit_():
+    window.destroy()
 
 # Tkinter Window
 window = Tk()
@@ -409,7 +417,7 @@ coverPhoto_label= Label(window, image=Updated_cover_pic).pack()
 Object_Clr_Selection_btn = Button(window, text="Box Color Selection", width=23, height=2, bg="#59788E", fg="black", command=ColorSelection).place(x=8,y=550)
 Manual_controlling_btn = Button(window, text="Manual Pick and Place", width=22, height=2, bg="#59788E", fg="black", command=manual_pp).place(x=254,y=550)
 Auto_controlling_btn = Button(window, text="Automatic Pick and Place", width=23, height=2, bg="#59788E", fg="black", command=auto_pp).place(x=8,y=600)
-Additional_features_btn = Button(window, text="Additional Features", width=22, height=2, bg="#59788E", fg="black", command=prev).place(x=254,y=600)
+exitButton = Button(window, text="Exit", width=22, height=2, bg="#59788E", fg="black", command=exit_).place(x=254,y=600)
 heading_barline = Label(window,text="-------------------------------------------------------------------------------",bg="#d0efff", fg="black").place(x=8,y=645)
 course_label= Label(window, text="  Course No || ECE 3200      ",fg='black', bg="#59788E").place(x=8, y=665)
 course_name_label= Label(window, text="  Course Name || Electronics Project Design/Dev.",fg='black', bg="#59788E").place(x=190, y=665)
