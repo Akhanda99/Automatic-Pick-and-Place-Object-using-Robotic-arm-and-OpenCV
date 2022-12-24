@@ -2,13 +2,13 @@
 from pyfirmata import Arduino, SERVO, util
 from tkinter import *
 from PIL import Image, ImageTk
-board= Arduino('/dev/cu.usbmodem1101')
+from tkinter import messagebox
+board= Arduino('/dev/cu.usbmodem1401')
 import time
 import cv2
 import numpy as np
 
 
-AllowedClr = []
 
 grip = board.get_pin('d:9:s')
 link2 = board.get_pin('d:11:s')
@@ -20,27 +20,32 @@ link1.write(40)
 link2.write(70)
 base.write(90)
 
-
+global allColorsList
 
 def ColorSelection():
     clrSwin=Toplevel(window)
     clrSwin.geometry("400x160")
     clrSwin.title("Box's Color Picking")
 
-    global AllowedClr
+
+    global allColorsList
+
+    # allColorsList=[]
     def send_colorData():
-        AllowedClr=[]
+        global allColorsList
+        allColorsList = []
+        # allColorsList = []
+        # allColorsList=[
         if redP.get()==1:
-            AllowedClr.append('red')
+            allColorsList.append('red')
         if blueP.get()==1:
-            AllowedClr.append('blue')
+            allColorsList.append('blue')
+
 
         # print(f'Selected Colors: {for i in range(0,len(AllowedClr))}')
         print("Selected Color/Colors ->")
-        for i in range(0,len(AllowedClr)):print(AllowedClr[i])
+        for i in range(0,len(allColorsList)):print(allColorsList[i])
         clrSwin.destroy()
-
-
 
     redP = IntVar()
     blueP=IntVar()
@@ -112,111 +117,117 @@ def manual_pp():
 
 
 def auto_pp():
+    try:
+        global allColorsList
+        if len(allColorsList)>0:
 
-    def move_to_obj(sleep):
-        for angle in range(70, 101, 1):
-            grip.write(90)
-            link2.write(angle)
-            link1.write(40)
-            base.write(89)
-            time.sleep(sleep)
+            def move_to_obj(sleep):
+                for angle in range(70, 101, 1):
+                    grip.write(90)
+                    link2.write(angle)
+                    link1.write(40)
+                    base.write(89)
+                    time.sleep(sleep)
 
-        for angle in range(40, 59, 1):
-            grip.write(90)
-            link2.write(100)
-            link1.write(angle)
-            base.write(89)
-            time.sleep(sleep)
+                for angle in range(40, 59, 1):
+                    grip.write(90)
+                    link2.write(100)
+                    link1.write(angle)
+                    base.write(89)
+                    time.sleep(sleep)
 
-        for angle in range(90, 50, -1):
-            grip.write(angle)
-            link2.write(100)
-            link1.write(58)
-            base.write(89)
-            time.sleep(sleep)
+                for angle in range(90, 50, -1):
+                    grip.write(angle)
+                    link2.write(100)
+                    link1.write(58)
+                    base.write(89)
+                    time.sleep(sleep)
 
-        for angle in range(100, 125, 1):
-            grip.write(50)
-            link2.write(angle)
-            link1.write(58)
-            base.write(89)
-            time.sleep(0.1)
+                for angle in range(100, 125, 1):
+                    grip.write(50)
+                    link2.write(angle)
+                    link1.write(58)
+                    base.write(89)
+                    time.sleep(0.1)
 
-    def pick_Obj(sleep):
-        for angle in range(55, 71, 1):
-            grip.write(angle)
-            link2.write(124)
-            link1.write(58)
-            base.write(90)
-            time.sleep(sleep)
+            def pick_Obj(sleep):
+                for angle in range(55, 71, 1):
+                    grip.write(angle)
+                    link2.write(124)
+                    link1.write(58)
+                    base.write(90)
+                    time.sleep(sleep)
 
-    def place_Obj(sleep):
-        for angle in range(124, 71, -1):
-            grip.write(70)
-            link2.write(angle)
-            link1.write(58)
-            base.write(90)
-            time.sleep(sleep)
+            def place_Obj(sleep):
+                for angle in range(124, 71, -1):
+                    grip.write(70)
+                    link2.write(angle)
+                    link1.write(58)
+                    base.write(90)
+                    time.sleep(sleep)
 
-        for angle in range(90, 125, 1):
-            grip.write(70)
-            link2.write(70)
-            link1.write(58)
-            base.write(angle)
-            time.sleep(sleep)
+                for angle in range(90, 125, 1):
+                    grip.write(70)
+                    link2.write(70)
+                    link1.write(58)
+                    base.write(angle)
+                    time.sleep(sleep)
 
-        for angle in range(70, 101, 1):
-            grip.write(70)
-            link2.write(angle)
-            link1.write(58)
-            base.write(125)
-            time.sleep(sleep)
+                for angle in range(70, 101, 1):
+                    grip.write(70)
+                    link2.write(angle)
+                    link1.write(58)
+                    base.write(125)
+                    time.sleep(sleep)
 
-        for angle in range(58, 46, -1):
-            grip.write(70)
-            link2.write(100)
-            link1.write(angle)
-            base.write(125)
-            time.sleep(sleep)
+                for angle in range(58, 46, -1):
+                    grip.write(70)
+                    link2.write(100)
+                    link1.write(angle)
+                    base.write(125)
+                    time.sleep(sleep)
 
-        for angle in range(100, 126, 1):
-            grip.write(70)
-            link2.write(angle)
-            link1.write(43)
-            base.write(125)
-            time.sleep(sleep)
+                for angle in range(100, 126, 1):
+                    grip.write(70)
+                    link2.write(angle)
+                    link1.write(43)
+                    base.write(125)
+                    time.sleep(sleep)
 
-        for angle in range(68, 55, -1):
-            grip.write(angle)
-            link2.write(125)
-            link1.write(45)
-            base.write(125)
-            time.sleep(0.1)
+                for angle in range(68, 55, -1):
+                    grip.write(angle)
+                    link2.write(125)
+                    link1.write(45)
+                    base.write(125)
+                    time.sleep(0.1)
 
-    def move_bake(sleep):
-        for angle in range(125, 100, -1):
-            grip.write(55)
-            link2.write(angle)
-            link1.write(45)
-            base.write(125)
-            time.sleep(sleep)
-
-
-        grip.write(90)
-        time.sleep(0.5)
-        link2.write(70)
-        time.sleep(0.5)
-        link1.write(40)
-        time.sleep(0.5)
-        base.write(90)
-        time.sleep(0.1)
-
-    move_to_obj(0.08)
-    pick_Obj(0.01)
-    place_Obj(0.01)
-    move_bake(0.01)
+            def move_bake(sleep):
+                for angle in range(125, 100, -1):
+                    grip.write(55)
+                    link2.write(angle)
+                    link1.write(45)
+                    base.write(125)
+                    time.sleep(sleep)
 
 
+                grip.write(90)
+                time.sleep(0.5)
+                link2.write(70)
+                time.sleep(0.5)
+                link1.write(40)
+                time.sleep(0.5)
+                base.write(90)
+                time.sleep(0.1)
+
+            move_to_obj(0.08)
+            pick_Obj(0.01)
+            place_Obj(0.01)
+            move_bake(0.01)
+        else:
+            print("NOT Picked the colors")
+    except:
+        messagebox.showerror("Error","Color is not Selected")
+        print("Color is not Selected")
 def prev():
     pass
 
@@ -243,7 +254,6 @@ resized_Pic= cover_pic.resize((480,400))
 Updated_cover_pic= ImageTk.PhotoImage(resized_Pic)
 
 coverPhoto_label= Label(window, image=Updated_cover_pic).pack()
-
 
 Object_Clr_Selection_btn = Button(window, text="Box Color Selection", width=23, height=2, bg="#59788E", fg="black", command=ColorSelection).place(x=8,y=550)
 Manual_controlling_btn = Button(window, text="Manual Pick and Place", width=22, height=2, bg="#59788E", fg="black", command=manual_pp).place(x=254,y=550)
