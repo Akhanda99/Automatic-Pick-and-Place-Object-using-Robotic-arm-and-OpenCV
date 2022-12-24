@@ -4,7 +4,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 from tkinter import messagebox
 import imutils
-board= Arduino('/dev/cu.usbmodem1101')
+board= Arduino('/dev/cu.usbmodem1401')
 import time
 import cv2
 import numpy as np
@@ -278,88 +278,103 @@ def auto_pp():
                 time.sleep(0.5)
                 base.write(90)
                 time.sleep(0.1)
+            def start_():
+                cap = cv2.VideoCapture(1)
+                cap.set(3, 640)
+                cap.set(4, 480)
 
-            cap = cv2.VideoCapture(1)
-            cap.set(3, 640)
-            cap.set(4, 480)
+                while True:
+                    _, frame = cap.read()
+                    hsvimg = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-            while True:
-                _, frame = cap.read()
-                hsvimg = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+                    lower_red = np.array([0, 50, 120])
+                    higher_red = np.array([10, 255, 255])
 
-                lower_red = np.array([0, 50, 120])
-                higher_red = np.array([10, 255, 255])
+                    lower_blue = np.array([90, 60, 0])
+                    higher_blue = np.array([121, 255, 255])
 
-                lower_blue = np.array([90, 60, 0])
-                higher_blue = np.array([121, 255, 255])
+                    mask1 = cv2.inRange(hsvimg, lower_red, higher_red)
+                    mask2 = cv2.inRange(hsvimg, lower_blue, higher_blue)
 
-                mask1 = cv2.inRange(hsvimg, lower_red, higher_red)
-                mask2 = cv2.inRange(hsvimg, lower_blue, higher_blue)
+                    conts1 = cv2.findContours(mask1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                    conts1 = imutils.grab_contours(conts1)
+                    conts2 = cv2.findContours(mask2, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                    conts2 = imutils.grab_contours(conts2)
+                    done = 0
+                    ObjectColor = ""
+                    if 'red' in allColorsList:
 
-                conts1 = cv2.findContours(mask1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-                conts1 = imutils.grab_contours(conts1)
-                conts2 = cv2.findContours(mask2, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-                conts2 = imutils.grab_contours(conts2)
-                done = 0
-                ObjectColor = ""
-                if 'red' in allColorsList:
+                        for c in conts1:
+                            area1 = cv2.contourArea(c)
+                            if area1 > 5000:
+                                cv2.drawContours(frame, [c], -1, (0, 255, 0), 3)
+                                M = cv2.moments(c)
 
-                    for c in conts1:
-                        area1 = cv2.contourArea(c)
-                        if area1 > 5000:
-                            cv2.drawContours(frame, [c], -1, (0, 255, 0), 3)
-                            M = cv2.moments(c)
+                                cx = int(M["m10"] / M["m00"])
+                                cy = int(M["m01"] / M["m00"])
 
-                            cx = int(M["m10"] / M["m00"])
-                            cy = int(M["m01"] / M["m00"])
+                                cv2.circle(frame, (cx, cy), 7, (255, 255, 255), -1)
+                                ObjectColor = "Red"
+                                cv2.putText(frame, "red", (cx - 20, cy - 20), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255, 255, 255), 3)
 
-                            cv2.circle(frame, (cx, cy), 7, (255, 255, 255), -1)
-                            ObjectColor = "Red"
-                            cv2.putText(frame, "red", (cx - 20, cy - 20), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255, 255, 255), 3)
+                                print("Red box is found")
+                                move_to_obj(0.08)
+                                pick_Obj(0.01)
+                                place_Obj_red(0.01)
+                                move_bake_red(0.01)
 
-                            print("Red box is found")
-                            move_to_obj(0.08)
-                            pick_Obj(0.01)
-                            place_Obj_red(0.01)
-                            move_bake_red(0.01)
-
-                        else:
-                            print("Red Box not exist")
+                            else:
+                                print("Red Box not exist")
 
 
-                if 'blue' in allColorsList:
-                    for c in conts2:
+                    if 'blue' in allColorsList:
+                        for c in conts2:
 
-                        area1 = cv2.contourArea(c)
-                        if area1 > 5000:
-                            cv2.drawContours(frame, [c], -1, (0, 255, 0), 3)
-                            M = cv2.moments(c)
+                            area1 = cv2.contourArea(c)
+                            if area1 > 5000:
+                                cv2.drawContours(frame, [c], -1, (0, 255, 0), 3)
+                                M = cv2.moments(c)
 
-                            cx = int(M["m10"] / M["m00"])
-                            cy = int(M["m01"] / M["m00"])
+                                cx = int(M["m10"] / M["m00"])
+                                cy = int(M["m01"] / M["m00"])
 
-                            cv2.circle(frame, (cx, cy), 7, (255, 255, 255), -1)
-                            ObjectColor = "Blue"
-                            cv2.putText(frame, "blue", (cx - 20, cy - 20), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255, 255, 255),
-                                        3)
+                                cv2.circle(frame, (cx, cy), 7, (255, 255, 255), -1)
+                                ObjectColor = "Blue"
+                                cv2.putText(frame, "blue", (cx - 20, cy - 20), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255, 255, 255),
+                                            3)
 
-                            print("Blue Box Detected")
-                            move_to_obj(0.08)
-                            pick_Obj(0.01)
-                            place_Obj_blue(0.01)
-                            move_bake_blue(0.01)
-                            done=1
-                        else:
-                            print("Blue Box not exist")
-                time.sleep(2)
+                                print("Blue Box Detected")
+                                move_to_obj(0.08)
+                                pick_Obj(0.01)
+                                place_Obj_blue(0.01)
+                                move_bake_blue(0.01)
+                                done=1
+                            else:
+                                print("Blue Box not exist")
+                    time.sleep(2)
 
-                # print(ObjectColor)
-                # cv2.imshow("result", frame)
-                # k = cv2.waitKey(1)
+                    # print(ObjectColor)
+                    cv2.imshow("result", frame)
+                    # k = cv2.waitKey(1)
 
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-            cap.release()
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        camWin.destroy()
+                        break
+
+                cap.release()
+
+            def stop_():
+                camWin.destroy()
+
+            camWin=Tk()
+            camWin.geometry("400x100")
+            camWin.title("Automatic Pick and Place")
+
+            startBtn=Button(camWin,text="Start", command=start_, height=2,width=5).place(x=50,y=30)
+            stopbtn = Button(camWin, text="Stop", command=stop_, height=2, width=5).place(x=250, y=30)
+
+            camWin.mainloop()
+
 
     except:
         messagebox.showerror("Error","Color is not Selected")
