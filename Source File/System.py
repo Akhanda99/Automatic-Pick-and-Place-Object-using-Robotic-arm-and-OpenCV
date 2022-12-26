@@ -3,7 +3,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 from tkinter import messagebox
 import imutils
-board= Arduino('/dev/cu.usbmodem1101')
+board= Arduino('/dev/cu.usbmodem1401')
 import time
 import cv2
 import numpy as np
@@ -34,15 +34,12 @@ def ColorSelection():
     def send_colorData():
         global allColorsList
         allColorsList = []
-        # allColorsList = []
-        # allColorsList=[
         if redP.get()==1:
             allColorsList.append('red')
         if blueP.get()==1:
             allColorsList.append('blue')
 
 
-        # print(f'Selected Colors: {for i in range(0,len(AllowedClr))}')
         print("Selected Color/Colors ->")
         for i in range(0,len(allColorsList)):print(allColorsList[i])
         clrSwin.destroy()
@@ -150,59 +147,52 @@ def auto_pp():
                     base.write(89)
                     time.sleep(0.1)
 
-            def pick_Obj_red(sleep):
-                for angle in range(55, 71, 1):
+            def pick_Obj(sleep):
+                for angle in range(55, 79, 1):
                     grip.write(angle)
                     link2.write(120)
                     link1.write(58)
                     base.write(90)
                     time.sleep(sleep)
 
-            def pick_Obj_blue(sleep):
-                for angle in range(55, 78, 1):
-                    grip.write(angle)
-                    link2.write(120)
-                    link1.write(58)
-                    base.write(90)
-                    time.sleep(sleep)
 
             def place_Obj_red(sleep):
                 for angle in range(124, 71, -1):
-                    grip.write(70)
+                    grip.write(78)
                     link2.write(angle)
                     link1.write(58)
                     base.write(90)
                     time.sleep(sleep)
 
                 for angle in range(90, 125, 1):
-                    grip.write(70)
+                    grip.write(78)
                     link2.write(70)
                     link1.write(58)
                     base.write(angle)
                     time.sleep(sleep)
 
                 for angle in range(70, 101, 1):
-                    grip.write(70)
+                    grip.write(78)
                     link2.write(angle)
                     link1.write(58)
                     base.write(125)
                     time.sleep(sleep)
 
                 for angle in range(58, 46, -1):
-                    grip.write(70)
+                    grip.write(78)
                     link2.write(100)
                     link1.write(angle)
                     base.write(125)
                     time.sleep(sleep)
 
                 for angle in range(100, 126, 1):
-                    grip.write(70)
+                    grip.write(78)
                     link2.write(angle)
                     link1.write(43)
                     base.write(125)
                     time.sleep(sleep)
 
-                for angle in range(68, 55, -1):
+                for angle in range(78, 55, -1):
                     grip.write(angle)
                     link2.write(125)
                     link1.write(45)
@@ -210,41 +200,41 @@ def auto_pp():
                     time.sleep(0.1)
             def place_Obj_blue(sleep):
                 for angle in range(124, 71, -1):
-                    grip.write(77)
+                    grip.write(78)
                     link2.write(angle)
                     link1.write(58)
                     base.write(90)
                     time.sleep(sleep)
 
                 for angle in range(90, 56, 1):
-                    grip.write(77)
+                    grip.write(78)
                     link2.write(70)
                     link1.write(58)
                     base.write(angle)
                     time.sleep(sleep)
 
                 for angle in range(70, 101, 1):
-                    grip.write(77)
+                    grip.write(78)
                     link2.write(angle)
                     link1.write(58)
                     base.write(55)
                     time.sleep(sleep)
 
                 for angle in range(58, 46, -1):
-                    grip.write(77)
+                    grip.write(78)
                     link2.write(100)
                     link1.write(angle)
                     base.write(55)
                     time.sleep(sleep)
 
                 for angle in range(100, 126, 1):
-                    grip.write(77)
+                    grip.write(78)
                     link2.write(angle)
                     link1.write(43)
                     base.write(55)
                     time.sleep(sleep)
 
-                for angle in range(68, 55, -1):
+                for angle in range(78, 55, -1):
                     grip.write(angle)
                     link2.write(125)
                     link1.write(45)
@@ -265,7 +255,6 @@ def auto_pp():
                 link1.write(40)
                 time.sleep(0.5)
                 base.write(90)
-                time.sleep(0.1)
 
             def move_bake_blue(sleep):
                 for angle in range(125, 100, -1):
@@ -284,7 +273,6 @@ def auto_pp():
                 link1.write(40)
                 time.sleep(0.5)
                 base.write(90)
-                time.sleep(0.1)
             def start_():
                 cap = cv2.VideoCapture(0)
                 cap.set(3, 640)
@@ -295,8 +283,8 @@ def auto_pp():
                     frame=cv2.resize(frame,(400,500))
                     hsvimg = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-                    lower_red = np.array([0, 50, 120])
-                    higher_red = np.array([10, 255, 255])
+                    lower_red = np.array([0, 100, 100])
+                    higher_red = np.array([5, 255, 255])
 
                     lower_blue = np.array([90, 60, 0])
                     higher_blue = np.array([121, 255, 255])
@@ -327,7 +315,7 @@ def auto_pp():
 
                                 print("Red box is found")
                                 move_to_obj(0.08)
-                                pick_Obj_red(0.01)
+                                pick_Obj(0.08)
                                 place_Obj_red(0.01)
                                 move_bake_red(0.01)
 
@@ -353,7 +341,7 @@ def auto_pp():
 
                                 print("Blue Box Detected")
                                 move_to_obj(0.08)
-                                pick_Obj_blue(0.1)
+                                pick_Obj(0.08)
                                 place_Obj_blue(0.01)
                                 move_bake_blue(0.01)
                                 done=1
@@ -408,7 +396,7 @@ barline = Label(window, text="--------------------------------------------------
 # # stp_1_Details = Label(window, text='[ Upload the Certificate Template ]', font=('Cursive', 12), bg="#d0efff").pack()
 # #
 
-cover_pic= Image.open('/Users/akhanda/Downloads/IMG_20221224_040138.jpg')
+cover_pic= Image.open('/Users/akhanda/Documents/Semester Project/Automatic Pick and Place using Robotic arm and OpenCV/Source File/coverPic.jpg')
 resized_Pic= cover_pic.resize((480,400))
 Updated_cover_pic= ImageTk.PhotoImage(resized_Pic)
 
